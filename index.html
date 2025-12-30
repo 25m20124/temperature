@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>숭례문 열 확산 시뮬레이션</title>
+<title>숭례문 화재 확산 시뮬레이션</title>
 
 <style>
 body {
@@ -16,6 +16,7 @@ body {
 
 canvas {
     border: 2px solid #aaa;
+    background: #000;
 }
 </style>
 </head>
@@ -28,55 +29,61 @@ canvas {
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// 배경 이미지
-const bg = new Image();
-bg.src = "images/스크린샷 2025-12-30 231420.png";
+// 숭례문 이미지
+const bgImage = new Image();
+bgImage.src = "images/sungnyemun.png";
 
-// 열 입자
-let heat = [];
+// 불 입자
+let fires = [];
 
-function createHeat() {
-    heat.push({
-        x: 350 + Math.random() * 40,
-        y: 230 + Math.random() * 30,
-        r: 10,
-        a: 0.25
+function createFire() {
+    fires.push({
+        x: 300 + Math.random() * 50,
+        y: 200 + Math.random() * 30,
+        r: 6,
+        a: 1
     });
 }
 
-function drawHeat(h) {
+function drawFire(f) {
     const g = ctx.createRadialGradient(
-        h.x, h.y, 0,
-        h.x, h.y, h.r
+        f.x, f.y, 0,
+        f.x, f.y, f.r
     );
 
-    g.addColorStop(0, `rgba(255,0,0,${h.a})`);
+    g.addColorStop(0, `rgba(255,200,50,${f.a})`);
+    g.addColorStop(0.5, `rgba(255,80,0,${f.a})`);
     g.addColorStop(1, `rgba(255,0,0,0)`);
 
     ctx.beginPath();
     ctx.fillStyle = g;
-    ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2);
+    ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
     ctx.fill();
 }
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-    if (Math.random() < 0.3) createHeat();
+    // 배경 이미지
+    ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
 
-    heat.forEach(h => {
-        h.r += 1.2;     // 열 확산
-        h.a -= 0.002;  // 점점 약해짐
-        drawHeat(h);
+    // 불 생성
+    if (Math.random() < 0.35) createFire();
+
+    fires.forEach(f => {
+        f.r += 0.7;
+        f.a -= 0.006;
+        f.x += Math.random() * 1.5;
+        f.y += Math.random() * 1.2;
+        drawFire(f);
     });
 
-    heat = heat.filter(h => h.a > 0);
+    fires = fires.filter(f => f.a > 0);
 
     requestAnimationFrame(animate);
 }
 
-bg.onload = animate;
+bgImage.onload = animate;
 </script>
 
 </body>
